@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Menu Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .container-fluid {
+            padding: 0;
+        }
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            padding: 20px;
+        }
+        .sidebar h5 {
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .sidebar .menu-item {
+            color: #adb5bd;
+            padding: 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .menu-item:hover {
+            background-color: #495057;
+            color: #ffffff;
+        }
+        .sidebar .menu-item.active {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .content {
+            padding: 40px;
+        }
+        .content h4 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+        #result {
+            white-space: pre-wrap;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #868e96;
+        }
+        .input-form {
+            margin-top: 20px;
+            display: none;
+        }
+        .spinner-border {
+            width: 20px;
+            height: 20px;
+            border-width: 2px;
+            margin-left: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h5>API Menu</h5>
+                <div class="menu-item active" onclick="callApi('/api/v1/endpoint1', this)">Endpoint 1
+                    <div class="spinner-border text-light" role="status" id="spinner1">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/v1/endpoint2', this)">Endpoint 2
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm()">Endpoint 3
+                    <div class="spinner-border text-light" role="status" id="spinner3">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="content">
+                    <h4>API Response</h4>
+                    <pre id="result">Click a menu item to call an API.</pre>
+                    <div class="input-form" id="inputForm">
+                        <h5>Input for Endpoint 3</h5>
+                        <div class="mb-3">
+                            <label for="userInput" class="form-label">Enter some data:</label>
+                            <input type="text" class="form-control" id="userInput">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput()">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner3">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2024 API Dashboard. All rights reserved.
+    </div>
+
+    <script>
+        function callApi(apiUrl, element) {
+            // Hide input form if visible
+            document.getElementById('inputForm').style.display = 'none';
+
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            // Add active class to the clicked menu item
+            element.classList.add('active');
+
+            // Show the loading spinner for the selected menu item
+            const spinner = element.querySelector('.spinner-border');
+            spinner.style.display = 'inline-block';
+
+            // Fetch data from the API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('result').innerText = 'Error: ' + error;
+                })
+                .finally(() => {
+                    // Hide the loading spinner once the response is received
+                    spinner.style.display = 'none';
+                });
+        }
+
+        function showInputForm() {
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show input form
+            document.getElementById('inputForm').style.display = 'block';
+        }
+
+        function submitInput() {
+            const userInput = document.getElementById('userInput').value;
+            const apiUrl = `/api/v1/endpoint3?input=${encodeURIComponent(userInput)}`;
+
+            // Show loading spinner for the form submit
+            const loadingSpinner = document.getElementById('loadingSpinner3');
+            loadingSpinner.style.display = 'inline-block';
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('result').innerText = 'Error: ' + error;
+                })
+                .finally(() => {
+                    // Hide loading spinner once the response is received
+                    loadingSpinner.style.display = 'none';
+                });
+        }
+    </script>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
