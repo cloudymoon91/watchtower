@@ -1,0 +1,4 @@
+flask
+mongoengine
+tldextract
+psycopg2-binary
