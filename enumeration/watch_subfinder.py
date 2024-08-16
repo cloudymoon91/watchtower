@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from database.db import *
+from utils import util
+
 
 def run_command_in_zsh(command):
     try:
@@ -37,7 +39,7 @@ def subfinder_domain(domain):
     program = Programs.objects(scopes=domain).first()
 
     if program:
-        print(f"[{current_time()}] running Subfinder module for '{domain}'")
+        print(f"[{util.current_time()}] running Subfinder module for '{domain}'")
         subs = subfinder(domain)
         # todo: save in file
 
@@ -47,7 +49,7 @@ def subfinder_domain(domain):
                 if re.search(r'\.\s*' + re.escape(domain), sub, re.IGNORECASE):
                     upsert_subdomain(program.program_name, sub, 'subfinder')
     else:
-        print(f"[{current_time()}] scope for '{domain}' does not exist in watchtower")
+        print(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
             
 
 if __name__ == "__main__":

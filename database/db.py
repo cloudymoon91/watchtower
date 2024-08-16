@@ -1,26 +1,6 @@
 from mongoengine import Document, StringField, DateTimeField, ListField, DictField, connect
 from datetime import datetime
-import tldextract, requests
-from config import config
-
-def current_time():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-def get_domain_name(url):
-    ext = tldextract.extract(url)
-    return f"{ext.domain}.{ext.suffix}"
-
-def send_discord_message(message):
-    data = {
-        "content": message
-    }
-
-    response = requests.post(config().get('WEBHOOK_URL'), json=data)
-
-    if response.status_code == 204:
-        pass
-    else:
-        print(f"Failed to send message. Status code: {response.status_code}")
+from utils import util
 
 # Connect to MongoDB
 connect(db='watch', host='mongodb://127.0.0.1:27017/watch')
@@ -103,7 +83,7 @@ def upsert_program(program_name, scopes, ooscopes, config):
         program.scopes = scopes
         program.ooscopes = ooscopes
         program.save()
-        print(f"[{current_time()}] Updated program: {program.program_name}")
+        print(f"[{util.current_time()}] Updated program: {program.program_name}")
     else:
         # Create new program
         new_program = Programs(
@@ -114,7 +94,7 @@ def upsert_program(program_name, scopes, ooscopes, config):
             ooscopes=ooscopes
         )
         new_program.save()
-        print(f"[{current_time()}] Inserted new program: {new_program.program_name}")
+        print(f"[{util.current_time()}] Inserted new program: {new_program.program_name}")
 
 def upsert_lives(obj):
     # obj: {'subdomain': 'account.web.superbet.ro', 'domain': 'superbet.ro', 'ips': ['18.245.253.35', '18.245.253.54', '18.245.253.9', '18.245.253.27']}
@@ -131,7 +111,7 @@ def upsert_lives(obj):
             existing.ips = obj.get('ips')
             existing.last_update = datetime.now()
             existing.save()
-            print(f"[{current_time()}] Updated liev subdomain: {obj.get('subdomain')}")
+            print(f"[{util.current_time()}] Updated live subdomain: {obj.get('subdomain')}")
             
     else:
         new_live_subdomain = LiveSubdomains(
@@ -146,8 +126,8 @@ def upsert_lives(obj):
         new_live_subdomain.save()
 
         # todo: notify if new live subdomain is added!
-        send_discord_message(f"```'{obj.get('subdomain')}' (fresh live) has been added to '{program.program_name}' program```")
-        print(f"[{current_time()}] Inserted new live subdomain: {obj.get('subdomain')}")
+        util.send_discord_message(f"```'{obj.get('subdomain')}' (fresh live) has been added to '{program.program_name}' program```")
+        print(f"[{util.current_time()}] Inserted new live subdomain: {obj.get('subdomain')}")
 
     return True
 
@@ -155,8 +135,8 @@ def upsert_lives(obj):
 def upsert_subdomain(program_name, subdomain_name, provider):
 
     program = Programs.objects(program_name=program_name).first()
-    if get_domain_name(subdomain_name) not in program.scopes or subdomain_name in program.ooscopes:
-        print(f"[{current_time()}] subdomain is not in scope: {subdomain_name}")
+    if util.get_domain_name(subdomain_name) not in program.scopes or subdomain_name in program.ooscopes:
+        print(f"[{util.current_time()}] subdomain is not in scope: {subdomain_name}")
         return True
     
     # todo: check if subdomain exists or not, filter: domain.tld or *.domain.tld
@@ -168,17 +148,17 @@ def upsert_subdomain(program_name, subdomain_name, provider):
             existing.providers.append(provider)
             existing.last_update = datetime.now()
             existing.save()
-            print(f"[{current_time()}] Updated subdomain: {subdomain_name}")
+            print(f"[{util.current_time()}] Updated subdomain: {subdomain_name}")
         else:
             pass
     else:
         new_subdomain = Subdomains(
             program_name=program_name,
             subdomain=subdomain_name,
-            scope=get_domain_name(subdomain_name),
+            scope=util.get_domain_name(subdomain_name),
             providers=[provider],
             created_date=datetime.now(),
             last_update=datetime.now()
         )
         new_subdomain.save()
-        print(f"[{current_time()}] Inserted new subdomain: {subdomain_name}")
+        print(f"[{util.current_time()}] Inserted new subdomain: {subdomain_name}")

@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from database.db import *
+from utils import util
+
 
 def run_command_in_zsh(command):
     try:
@@ -78,14 +80,14 @@ def crtsh(domain):
 def crtsh_domian(domain):
     program = Programs.objects(scopes=domain).first()
     if program:
-        print(f"[{current_time()}] running Crtsh module for '{domain}'")
+        print(f"[{util.current_time()}] running Crtsh module for '{domain}'")
         subs = crtsh(domain)
         # todo: save in file
         # save in watchtower datanbase
         for sub in subs:
             upsert_subdomain(program.program_name, sub, 'crtsh')
     else:
-        print(f"[{current_time()}] scope for '{domain}' does not exist in watchtower")
+        print(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
     
 
 if __name__ == "__main__":
