@@ -16,7 +16,7 @@ def enumeration_all():
             print(f"[{util.current_time()}] enumerating subdomains for '{scope}' domain...")
             
             watch_subfinder.subfinder_domain(scope)
-            watch_crtsh.crtsh_domian(scope)
+            watch_crtsh.crtsh_domain(scope)
             watch_abuseipdb.abuseipdb_domain(scope)
             watch_chaos.chaos_domain(scope)
             watch_gau.gau_domain(scope)

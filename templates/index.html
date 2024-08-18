@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchtower API Menu</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <h5>API Menu</h5>
+                <div class="menu-item" onclick="callApi('/api/programs/all', this)">get all program
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm('inputForm3', this)">get subdomain of domain
+                    <div class="spinner-border text-light" role="status" id="spinner3">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm('inputForm4', this)">get subdomain of program
+                    <div class="spinner-border text-light" role="status" id="spinner4">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/subdomains/all', this)">get all subdomains
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/lives/all', this)">get all lives
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/lives/fresh', this)">get all fresh lives
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm('inputForm5', this)">get lives by provider
+                    <div class="spinner-border text-light" role="status" id="spinner5">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm('inputForm6', this)">get lives by subdomain
+                    <div class="spinner-border text-light" role="status" id="spinner6">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/http/fresh', this)">get http fresh
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="showInputForm('inputForm7', this)">get http by provider
+                    <div class="spinner-border text-light" role="status" id="spinner7">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="callApi('/api/http/all', this)">get http all
+                    <div class="spinner-border text-light" role="status" id="spinner2">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="content">
+                    <h4>watchtower Response</h4>
+                    
+                    <!-- Input forms for different endpoints -->
+                    <div class="input-form" id="inputForm3">
+                        <h5>Input for subdomain of domain</h5>
+                        <div class="mb-3">
+                            <label for="userInput3" class="form-label">Enter domain:</label>
+                            <input type="text" class="form-control" id="userInput3">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput('userInput3', '/api/subdomains/domain', 'loadingSpinner3')">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner3">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="input-form" id="inputForm4">
+                        <h5>Input for subdomain of program</h5>
+                        <div class="mb-3">
+                            <label for="userInput4" class="form-label">Enter program:</label>
+                            <input type="text" class="form-control" id="userInput4">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput('userInput4', '/api/subdomains/program', 'loadingSpinner4')">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner4">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="input-form" id="inputForm5">
+                        <h5>Input for lives of provider</h5>
+                        <div class="mb-3">
+                            <label for="userInput5" class="form-label">Enter provider:</label>
+                            <input type="text" class="form-control" id="userInput5">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput('userInput5', '/api/lives/provider', 'loadingSpinner5')">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner5">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="input-form" id="inputForm6">
+                        <h5>Input for live of subdomain</h5>
+                        <div class="mb-3">
+                            <label for="userInput6" class="form-label">Enter subdomain:</label>
+                            <input type="text" class="form-control" id="userInput6">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput('userInput6', '/api/live/subdomain', 'loadingSpinner6')">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner6">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="input-form" id="inputForm7">
+                        <h5>Input for http of provider</h5>
+                        <div class="mb-3">
+                            <label for="userInput7" class="form-label">Enter provider:</label>
+                            <input type="text" class="form-control" id="userInput7">
+                        </div>
+                        <button class="btn btn-primary" onclick="submitInput('userInput7', '/api/http/provider', 'loadingSpinner7')">Submit</button>
+                        <div class="spinner-border text-primary" role="status" id="loadingSpinner7">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <pre id="result">Click a menu item to call an API.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2024 API watchtower of cloudymoon Dashboard. All rights reserved.
+    </div>
+
+    <script src="/static/script.js"></script>
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
