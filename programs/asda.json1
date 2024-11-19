@@ -1,0 +1,25 @@
+{
+    "program_name": "walmart",
+    "scopes": [
+        "asdasupplier.com",
+        "asdaclothes.co.uk",
+        "asdamediapartnership.com",
+        "asdastars.com",
+        "tellasda.com",
+        "asda-living.com",
+        "asda-travel.co.uk",
+        "asdafoundation.org",
+        "asda.com",
+        "asdagiftcards.com",
+        "asdamobile.com",
+        "asdafinance.com",
+        "asda.jobs",
+        "asda.co.uk",
+        "asda-photo.co.uk",
+        "asdatyres.co.uk",
+        "asdamotoring.co.uk",
+        "asdatotalpackage.co.uk",
+        "asda.uk"
+    ],
+    "ooscopes": [""]
+}

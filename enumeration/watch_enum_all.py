@@ -9,11 +9,11 @@ def enumeration_all():
     programs = Programs.objects.all()
 
     for program in programs:
-        print(f"[{util.current_time()}] let's go for '{program.program_name}' program...")
+        util.logger.info(f"[{util.current_time()}] let's go for '{program.program_name}' program...")
         scopes = program.scopes
 
         for scope in scopes:
-            print(f"[{util.current_time()}] enumerating subdomains for '{scope}' domain...")
+            util.logger.info(f"[{util.current_time()}] enumerating subdomains for '{scope}' domain...")
             
             watch_subfinder.subfinder_domain(scope)
             watch_crtsh.crtsh_domain(scope)

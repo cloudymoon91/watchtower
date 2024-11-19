@@ -23,14 +23,14 @@ def download_and_unzip():
         )
 
         # Execute the command
-        print(f"{util.colors.GRAY}Executing command: {curl_command}{util.colors.RESET}")
+        util.logger.info(f"{util.colors.GRAY}Executing command: {curl_command}{util.colors.RESET}")
         util.run_command_in_zsh(curl_command)
 
         # Move the files from temp_dir to CHAOS_FOLDER
         for filename in os.listdir(temp_dir):
             shutil.move(os.path.join(temp_dir, filename), CHAOS_FOLDER)
 
-        print("Files downloaded and unzipped successfully.")
+        util.logger.info("Files downloaded and unzipped successfully.")
 
 
 if __name__ == "__main__":

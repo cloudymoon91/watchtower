@@ -1,0 +1,13 @@
+{
+    "program_name": "tidal",
+    "scopes": [
+        "tidal.com",
+        "wimpmusic.com",
+        "tidalhifi.com",
+        "tidalhi.fi",
+        "tdl.sh"
+    ],
+    "ooscopes": [
+        
+    ]
+}

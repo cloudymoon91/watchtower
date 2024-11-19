@@ -1,0 +1,9 @@
+{
+    "program_name": "etsy",
+    "scopes": [
+        "etsy.com"
+    ],
+    "ooscopes": [
+        "icht.etsysecure.com"
+    ]
+}

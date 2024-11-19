@@ -1,0 +1,10 @@
+{
+    "program_name": "bigcommerce",
+    "scopes": [
+        "bigcommerce.net",
+        "bigcommerce.com",
+        "YOUR-TESTING-STORE.mybigcommerce.com",
+        "STORE-YOURSTOREHash.mybigcommerce.com"
+    ],
+    "ooscopes": [""]
+}

@@ -1,0 +1,36 @@
+{
+    "program_name": "bigcommerce",
+    "scopes": [
+        "www.kohls.com"
+    ],
+    "ooscopes": [
+        "apply.kohls.com",
+        "*kohls.com/kohlscredit/prequal",
+        "*kohlsecommerce.com/kohlscredit/prequal",
+        "corporate.kohls.com",
+        "productchampions.kohls.com",
+        "link-preprod.kohls.com",
+        "developer.kohls.com",
+        "lclive.kohls.com",
+        "author-mykohls.kohls.com",
+        "mykohls-origin.kohls.com",
+        "origin-stage65-corporate.kohls.com",
+        "origin-stage65-mykohls.kohls.com",
+        "author-stage65-mykohls.kohls.com",
+        "stage65-corporate.kohls.com",
+        "stage65-mykohls.kohls.com",
+        "author-qa65-mykohls.kohls.com",
+        "mykohls.kohls.com",
+        "any domain with archaius.json endoint is out of scope",
+        "*kohls.com/feature/pre-qual/prequal_inquiry.jsp?icid=prequalfooter",
+        "*kohls.com/checkout/prequal_inquiry.jsp#/preQualEligible",
+        "*kohlsecommerce.com/feature/pre-qual/prequal_inquiry.jsp?icid=prequalfooter",
+        "*kohlsecommerce.com/checkout/prequal_inquiry.jsp#/preQualEligible",
+        "vp-*.kohls.com",
+        "*qa*.kohls.com",
+        "wfh*.kohls.com",
+        "kconnect.kohls.com",
+        "connection.kohls.com",
+        "kohlsmerch.kohls.com"
+    ]
+}

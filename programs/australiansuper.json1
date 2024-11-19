@@ -1,0 +1,16 @@
+{
+    "program_name": "australiansuper",
+    "scopes": [
+        "australiansuper.com",
+        "portal.australiansuper.com",
+        "business.australiansuper.com",
+        "adviser.australiansuper.com",
+        "apis.australiansuper.com",
+        "apis-v5.australiansuper.com"
+    ],
+    "ooscopes": [
+        "australiansuper.atlassian.net",
+        "australiansuper.sharepoint.com",
+        "*.australiansuper.com"
+    ]
+}

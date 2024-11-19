@@ -22,7 +22,7 @@ def dynamic_brute(domain):
             f"cat {dns_gen_words} {alt_dns_words} | sort -u > {merged_path}",
         ]
         for cmd in commands:
-            print(f"{util.colors.GRAY}Executing command: {cmd}{util.colors.RESET}")
+            util.logger.debug(f"{util.colors.GRAY}Executing command: {cmd}{util.colors.RESET}")
             util.run_command_in_zsh(cmd)
 
         # Step 2: Get subdomains for dynamic brute
@@ -44,7 +44,7 @@ def dynamic_brute(domain):
             f"shuffledns -list {domain_dns_gen} -d {domain} -r ~/.resolvers "
             f"-m $(which massdns) -mode resolve -t 100 -silent"
         )
-        print(f"{util.colors.GRAY}Executing command: {shuffledns_command}{util.colors.RESET}")
+        util.logger.debug(f"{util.colors.GRAY}Executing command: {shuffledns_command}{util.colors.RESET}")
         result = util.run_command_in_zsh(shuffledns_command)
 
         return result
@@ -54,20 +54,20 @@ def ns_dynamic_brute_domain(domain):
     program = Programs.objects(scopes=domain).first()
 
     if program:
-        print(f"[{util.current_time()}] running ns_brute module for '{domain}'")
+        util.logger.info(f"[{util.current_time()}] running ns_brute module for '{domain}'")
         subs = dynamic_brute(domain)
         for sub in subs:
             if re.search(r"\.\s*" + re.escape(domain), sub, re.IGNORECASE):
                 upsert_subdomain(program.program_name, sub, "dynamic_brute")
                 upsert_lives(domain=domain, subdomain=sub, ips=[], tag="")
     else:
-        print(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
+        util.logger.info(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
 
 if __name__ == "__main__":
     domain = sys.argv[1] if len(sys.argv) > 1 else False
 
     if not domain:
-        print(f"Usage: watch_ns_brute domain")
+        util.logger.info(f"Usage: watch_ns_brute domain")
         sys.exit()
 
     ns_dynamic_brute_domain(domain)

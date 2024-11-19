@@ -1,4 +1,6 @@
 {
     "DO_NS_BRUTE": false,
-    "NOTIF": false
+    "DISCORD_BATCH_SIZE_HTTP": 10,
+    "DISCORD_BATCH_SIZE_NS": 5,
+    "TAG": ""
 }

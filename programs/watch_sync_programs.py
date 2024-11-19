@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from database.db import upsert_program
 from config.config import config
+from utils import util
 
 def scan_directory_for_json_files(directory):
     # Loop through all files in the directory
@@ -12,7 +13,7 @@ def scan_directory_for_json_files(directory):
         # Check if the file ends with .json
         if filename.endswith('.json'):
             file_path = os.path.join(directory, filename)
-            print(f"Processing file: {file_path}")
+            util.logger.info(f"Processing file: {file_path}")
             
             # Open and read the JSON file
             with open(file_path, 'r') as file:
@@ -21,10 +22,8 @@ def scan_directory_for_json_files(directory):
                     # Print properties
                     upsert_program(data.get('program_name'), data.get('scopes'), data.get('ooscopes'), {})
 
-                    print()  # Print a newline for readability
                 except json.JSONDecodeError as e:
-                    print(f"Error parsing JSON file {file_path}: {e}")
-                    print()
+                    util.logger.info(f"Error parsing JSON file {file_path}: {e}")
 
 def scan_programs():
     directory_to_scan = os.path.join(config().get('WATCH_DIR'), 'programs')

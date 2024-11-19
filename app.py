@@ -8,7 +8,6 @@ from api.programs import router as programs_router
 from api.subdomains import router as subdomains_router
 from api.http import router as http_router
 
-import threading
 from operation_all import main_loop
 
 
@@ -31,7 +30,7 @@ async def read_root(request: Request):
 
 
 if __name__ == '__main__':
-    threading.Thread(target=main_loop, args=()).start()
+    main_loop()
     
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=5000, log_level="info")

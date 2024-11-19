@@ -1,0 +1,8 @@
+{
+    "program_name": "financialforce",
+    "scopes": [
+        "financialforce.com",
+        "certinia.com"        
+    ],
+    "ooscopes": ["gslink.financialforce.com"]
+}

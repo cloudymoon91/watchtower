@@ -1,0 +1,27 @@
+id: parameter-matcher
+
+info:
+  name: parameter Matcher
+  author: cloudymoon
+  severity: high
+
+http:
+  - raw:
+      - |
+        GET / HTTP/1.1
+        Host: {{Hostname}}
+        User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0
+        Accept: */*
+
+    matchers-condition: or
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "<b/mamad"
+          - "\"mamad\"\""
+          - "'mamad''"
+          - "mamad\\\"\""
+          - "mamad\\'\'"
+          - "\"mamad"
+          - "'\\'mamad"

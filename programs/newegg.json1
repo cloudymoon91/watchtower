@@ -1,0 +1,13 @@
+{
+    "program_name": "newegg",
+    "scopes": [
+        "newegg.ca",
+        "newegg.com"
+    ],
+    "ooscopes": [
+        "*.neweggbusiness.com",
+        "sellingpilot.newegg.com",
+        "jobs.newegg.com",
+        "sellerportal.newegg.com"
+    ]
+}

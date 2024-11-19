@@ -7,35 +7,32 @@ from database.db import *
 from utils import util
 
 def abuseipdb(domain):
-    url = f"https://www.abuseipdb.com/whois/{domain}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-    }
-    cookies = {
-        "abuseipdb_session": "YOUR-SESSION",  # Replace YOUR-SESSION with your actual session ID
-    }
+    command = (
+        f'curl -s "https://www.abuseipdb.com/whois/{domain}" '
+        '-H "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
+        '(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36" '
+        '-b "abuseipdb_session=YOUR-SESSION" | '
+        "grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox} "
+        "--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox} "
+        "--color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox} "
+        f'-E "<li>\\w.*</li>" | sed -E "s/<\\/?li>//g" | sed "s|$|.{domain}|"'
+    )
 
-    print(f"{util.colors.GRAY}Requesting URL: {url}{util.colors.RESET}")
-    response = requests.get(url, headers=headers, cookies=cookies)
+    util.logger.debug(f"{util.colors.GRAY}Executing commands: {command}{util.colors.RESET}")
+    res = util.run_command_in_zsh(command)
 
-    if response.status_code != 200:
-        print(f"Error occurred: {response.status_code} - {response.reason}")
-        return []
+    res_num = len(res) if res else 0
+    util.logger.debug(f"{util.colors.GRAY}done for {domain}, results: {res_num}{util.colors.RESET}")
 
-    # Extracting the data using regex
-    results = re.findall(r'<li>(\w.*)</li>', response.text)
-    results = [f"{result.strip()}.{domain}" for result in results]
+    return res
 
-    print(f"{util.colors.GRAY}done for {domain}, results: {len(results)}{util.colors.RESET}")
-
-    return results
 
 def abuseipdb_domain(domain):
     
     program = Programs.objects(scopes=domain).first()
 
     if program:
-        print(f"[{util.current_time()}] running abuseipdb module for '{domain}'")
+        util.logger.info(f"[{util.current_time()}] running abuseipdb module for '{domain}'")
         subs = abuseipdb(domain)
 
         # save in watch database
@@ -44,13 +41,13 @@ def abuseipdb_domain(domain):
                 upsert_subdomain(program.program_name, sub, 'abuseipdb')
 
     else:
-        print(f"[{util.current_time()}] scope for '{domain}' does not exist in watch-tower")
+        util.logger.info(f"[{util.current_time()}] scope for '{domain}' does not exist in watch-tower")
 
 if __name__ == "__main__":
     domain = sys.argv[1] if len(sys.argv) > 1 else False
 
     if domain is False:
-        print(f"Usage: watch_abuseipdb domain")
+        util.logger.info(f"Usage: watch_abuseipdb domain")
         sys.exit()
 
     abuseipdb_domain(domain)

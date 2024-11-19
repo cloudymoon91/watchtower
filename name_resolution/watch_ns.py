@@ -21,7 +21,7 @@ def dnsx(subdomains_array, domain):
         f"-rl 30 -t 10 -r 8.8.4.4,129.250.35.251,208.67.222.222"
     )
 
-    print(f"{util.colors.GRAY}Executing command: {command}{util.colors.RESET}")
+    util.logger.debug(f"{util.colors.GRAY}Executing command: {command}{util.colors.RESET}")
 
     # Execute the command and capture the results
     results = util.run_command_in_zsh(command)
@@ -38,7 +38,7 @@ def ns_domain(domain):
     obj_subs = Subdomains.objects(scope=domain)
 
     if obj_subs:
-        print(f"[{util.current_time()}] Running Dnsx module for '{domain}'")
+        util.logger.debug(f"[{util.current_time()}] Running Dnsx module for '{domain}'")
 
         # Call the dnsx function with the list of subdomains and domain name
         results = dnsx([obj_sub.subdomain for obj_sub in obj_subs], domain)
@@ -53,7 +53,7 @@ def ns_domain(domain):
                 tag=tag,
             )
     else:
-        print(f"[{util.current_time()}] Domain '{domain}' does not exist in watchtower")
+        util.logger.info(f"[{util.current_time()}] Domain '{domain}' does not exist in watchtower")
 
 
 if __name__ == "__main__":
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     domain = sys.argv[1] if len(sys.argv) > 1 else False
 
     if not domain:
-        print("Usage: watch_ns <domain>")
+        util.logger.info("Usage: watch_ns <domain>")
         sys.exit()
 
     ns_domain(domain)

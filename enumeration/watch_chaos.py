@@ -18,7 +18,7 @@ def chaos(domain):
             lines = [line.strip() for line in file.readlines()]
         return lines
     else:
-        print(f"{domain} does not exist in Chaos module.")
+        util.logger.info(f"{domain} does not exist in Chaos module.")
         return []
 
 def chaos_domain(domain):
@@ -26,7 +26,7 @@ def chaos_domain(domain):
     program = Programs.objects(scopes=domain).first()
 
     if program:
-        print(f"[{util.current_time()}] running Chaos module for '{domain}'")
+        util.logger.info(f"[{util.current_time()}] running Chaos module for '{domain}'")
         subs = chaos(domain)
         for sub in subs:
             if (
@@ -35,13 +35,13 @@ def chaos_domain(domain):
             ):
                 upsert_subdomain(program.program_name, sub, "chaos")
     else:
-        print(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
+        util.logger.info(f"[{util.current_time()}] scope for '{domain}' does not exist in watchtower")
 
 if __name__ == "__main__":
     domain = sys.argv[1] if len(sys.argv) > 1 else False
 
     if not domain:
-        print(f"Usage: watch_chaos domain")
+        util.logger.info(f"Usage: watch_chaos domain")
         sys.exit()
 
     chaos_domain(domain)

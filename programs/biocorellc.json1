@@ -1,0 +1,11 @@
+{
+    "program_name": "biocorellc",
+    "scopes": [
+        "biocorellc.com",
+        "tempus-ex.com",
+        "infiniteathlete.ai",
+        "platform.infiniteathlete.ai",
+        "docs.tempus-ex.com"
+    ],
+    "ooscopes": [""]
+}

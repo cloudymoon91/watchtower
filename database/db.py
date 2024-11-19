@@ -1,6 +1,5 @@
 from mongoengine import Document, StringField, DateTimeField, ListField, DictField, IntField, connect
-from datetime import datetime
-from config.config import config
+from datetime import datetime, timedelta
 from utils import util
 
 
@@ -83,21 +82,16 @@ class Http(Document):
 4. changes of techs or status codes or etc
 '''
 
-
-
-# Upsert Programs
 def upsert_program(program_name, scopes, ooscopes, config):
     program = Programs.objects(program_name=program_name).first()
-    
+
     if program:
-        # Update existing program fields
         program.config = config
         program.scopes = scopes
         program.ooscopes = ooscopes
         program.save()
-        print(f"[{util.current_time()}] Updated program: {program.program_name}")
+        util.logger.debug(f"[{util.current_time()}] Updated program: {program.program_name}")
     else:
-        # Create new program
         new_program = Programs(
             program_name=program_name,
             created_date=datetime.now(),
@@ -106,10 +100,11 @@ def upsert_program(program_name, scopes, ooscopes, config):
             ooscopes=ooscopes
         )
         new_program.save()
-        print(f"[{util.current_time()}] Inserted new program: {new_program.program_name}")
+        util.logger.debug(f"[{util.current_time()}] Inserted new program: {new_program.program_name}")
 
 
 def upsert_lives(domain, subdomain, ips, tag):
+    subdomain = subdomain.lower()
     program = Programs.objects(scopes=domain).first()
     existing = LiveSubdomains.objects(subdomain=subdomain).first()
 
@@ -118,7 +113,7 @@ def upsert_lives(domain, subdomain, ips, tag):
         ips.sort()
         if ips != existing.ips:
             existing.ips = ips
-            print(f"[{util.current_time()}] Updated live subdomain: {subdomain}")
+            util.logger.debug(f"[{util.current_time()}] Updated live subdomain: {subdomain}")
         existing.last_update = datetime.now()
         existing.save()
     else:
@@ -132,94 +127,202 @@ def upsert_lives(domain, subdomain, ips, tag):
             last_update=datetime.now(),
         )
         new_live_subdomain.save()
-        util.send_discord_message(f"```'{subdomain}' (fresh live) has been added to '{program.program_name}' program```", config().get('WEBHOOK_URL_NS'))
-        print(f"[{util.current_time()}] Inserted new live subdomain: {subdomain}")
+        util.send_discord_message(f"```'{subdomain}' (fresh live) has been added to '{program.program_name}' program```", "WEBHOOK_URL_NS")
+        util.logger.debug(f"[{util.current_time()}] Inserted new live subdomain: {subdomain}")
 
     return True
 
-def upsert_http(obj):
+def upsert_http(subdomain, scope, ips, tech, title, status_code, headers, url, final_url, favicon):
     # {'subdomain': 'dl-api.voorivex.academy', 'scope': 'voorivex.academy', 'ips': ['185.166.104.4', '185.166.104.3'], 'tech': ['HSTS'], 'title': '', 'status_code': 403, 'headers': {'accept_ranges': 'bytes', 'cache_control': 'no-store', 'content_length': '15', 'content_type': 'text/html; charset=utf-8', 'date': 'Thu, 15 Aug 2024 12:45:17 GMT', 'server': 'Delivery', 'strict_transport_security': 'max-age=31536000', 'x_zrk_sn': '2001'}, 'url': 'https://dl-api.voorivex.academy:443', 'final_url': ''}
 
-    program = Programs.objects(scopes=obj.get('scope')).first()
+    program = Programs.objects(scopes=scope).first()
     # program.program_name
 
     # already existed http service
-    existing = Http.objects(subdomain=obj.get('subdomain')).first()
+    existing = Http.objects(subdomain=subdomain).first()
     if existing:
 
-        if existing.title != obj.get('title'):
-            util.send_discord_message(f"```'{obj.get('subdomain')}' title has been changed from '{existing.title}' to '{obj.get('title')}'```", config().get('WEBHOOK_URL_HTTP'))
-            print(f"[{util.current_time()}] changes title for subdomain: {obj.get('subdomain')}")
-            existing.title = obj.get('title')
+        if existing.title != title:
+            util.send_discord_message(f"```'{subdomain}' title has been changed from '{existing.title}' to '{title}'```", "WEBHOOK_URL_HTTP")
+            util.logger.debug(f"[{util.current_time()}] changes title for subdomain: {subdomain}")
+            existing.title = title
 
-        if existing.status_code != obj.get('status_code'):
-            util.send_discord_message(f"```'{obj.get('subdomain')}' status code has been changed from '{existing.status_code}' to '{obj.get('status_code')}'```", config().get('WEBHOOK_URL_HTTP'))
-            print(f"[{util.current_time()}] changes status code for subdmoain: {obj.get('subdomain')}")
-            existing.status_code = obj.get('status_code')
+        if existing.status_code != status_code:
+            util.send_discord_message(f"```'{subdomain}' status code has been changed from '{existing.status_code}' to '{status_code}'```", "WEBHOOK_URL_HTTP")
+            util.logger.debug(f"[{util.current_time()}] changes status code for subdmoain: {subdomain}")
+            existing.status_code = status_code
 
         
-        if existing.favicon != obj.get('favicon'):
-            util.send_discord_message(f"```'{obj.get('subdomain')}' favhash has been changed from '{existing.favicon}' to '{obj.get('favicon')}'```", config().get('WEBHOOK_URL_HTTP'))
-            print(f"[{util.current_time()}] changes favhash for subdomain: {obj.get('subdomain')}")
-            existing.favicon = obj.get('favicon')
+        if existing.favicon != favicon:
+            util.send_discord_message(f"```'{subdomain}' favhash has been changed from '{existing.favicon}' to '{favicon}'```", "WEBHOOK_URL_HTTP")
+            util.logger.debug(f"[{util.current_time()}] changes favhash for subdomain: {subdomain}")
+            existing.favicon = favicon
 
-        existing.ips = obj.get('ips')
-        existing.tech = obj.get('tech')
-        existing.headers = obj.get('headers')
-        existing.url = obj.get('url')
-        existing.final_url = obj.get('final_url')
+        existing.ips = ips
+        existing.tech = tech
+        existing.headers = headers
+        existing.url = url
+        existing.final_url = final_url
         existing.last_update = datetime.now()
         existing.save()
 
     else:
         new_http = Http(
             program_name = program.program_name,
-            subdomain = obj.get('subdomain'),
-            scope = obj.get('scope'),
-            ips = obj.get('ips'),
-            tech = obj.get('tech'),
-            title = obj.get('title'),
-            status_code = obj.get('status_code'),
-            headers = obj.get('headers'),
-            url = obj.get('url'),
-            final_url = obj.get('final_url'),
-            favicon = obj.get('favicon'),
+            subdomain = subdomain,
+            scope = scope,
+            ips = ips,
+            tech = tech,
+            title = title,
+            status_code = status_code,
+            headers = headers,
+            url = url,
+            final_url = final_url,
+            favicon = favicon,
             created_date = datetime.now(),
             last_update = datetime.now()
         )
         new_http.save()
 
-        # todo: notify if new live subdomain is added!
-        util.send_discord_message(f"```'{obj.get('subdomain')}' (fresh http) has been added to '{program.program_name}' program```", config().get('WEBHOOK_URL_HTTP'))
-        print(f"[{util.current_time()}] Inserted new http service: {obj.get('subdomain')}")
+        util.send_discord_message(f"```'{subdomain}' (fresh http) has been added to '{program.program_name}' program```", "WEBHOOK_URL_HTTP")
+        util.logger.debug(f"[{util.current_time()}] Inserted new http service: {subdomain}")
 
     return True
 
 # Check if subdomain exists, if not insert, if yes update providers
-def upsert_subdomain(program_name, subdomain_name, provider):
-
+def upsert_subdomain(program_name, subdomain, provider):
     program = Programs.objects(program_name=program_name).first()
-
-    if not util.is_in_scope(subdomain_name, program.scopes, program.ooscopes):
-        print(f"[{util.current_time()}] subdomain is not in scope: {subdomain_name}")
+    subdomain = subdomain.lower()
+    if not util.is_in_scope(subdomain, program.scopes, program.ooscopes):
+        util.logger.debug(f"[{util.current_time()}] subdomain is not in scope: {subdomain}")
         return True
 
-    existing = Subdomains.objects(program_name=program_name, subdomain=subdomain_name).first()
+    existing = Subdomains.objects(program_name=program_name, subdomain=subdomain).first()
 
     if existing:
         if provider not in existing.providers:
             existing.providers.append(provider)
             existing.last_update = datetime.now()
             existing.save()
-            print(f"[{util.current_time()}] Updated subdomain: {subdomain_name}")
+            util.logger.debug(f"[{util.current_time()}] Updated subdomain: {subdomain}")
     else:
         new_subdomain = Subdomains(
             program_name=program_name,
-            subdomain=subdomain_name,
-            scope=util.get_domain_name(subdomain_name),
+            subdomain=subdomain,
+            scope=util.get_domain_name(subdomain),
             providers=[provider],
             created_date=datetime.now(),
             last_update=datetime.now()
         )
         new_subdomain.save()
-        print(f"[{util.current_time()}] Inserted new subdomain: {subdomain_name}")
+        util.logger.debug(f"[{util.current_time()}] Inserted new subdomain: {subdomain}")
+        
+def get_subdomains(
+    program=None,
+    scope=None,
+    provider=None,
+    fresh=False,
+    count=False,
+    limit=None,
+    page=None,
+):
+    filters = {}
+    if program:
+        filters["program_name"] = program
+    if scope:
+        filters["scope"] = scope
+    if provider:
+        filters["providers"] = [provider]
+    if fresh:
+        twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+        filters["created_date__gte"] = twenty_four_hours_ago
+
+    subdomains = Subdomains.objects(**filters)
+    if count:
+        return subdomains.count()
+
+    if limit is not None and page is not None:
+        offset = (page - 1) * limit
+        subdomains = subdomains.skip(offset).limit(limit)
+
+    return subdomains
+
+def get_lives(
+    program=None,
+    scope=None,
+    provider=None,
+    tag=None,
+    fresh=False,
+    count=False,
+    limit=None,
+    page=None,
+):
+    filters = {}
+    if program:
+        filters["program_name"] = program
+    if scope:
+        filters["scope"] = scope
+    if fresh:
+        twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+        filters["created_date__gte"] = twenty_four_hours_ago
+    if provider:
+        twelve_hours_ago = datetime.now() - timedelta(hours=12)
+        subdomains = Subdomains.objects(providers=[provider])
+        sub_urls = [sub.subdomain for sub in subdomains]
+        filters["subdomain__in"] = sub_urls
+        filters["last_update__gte"] = twelve_hours_ago
+    if tag != None:
+        filters["tag"] = tag
+
+    subdomains = LiveSubdomains.objects(**filters)
+    if count:
+        return subdomains.count()
+
+    if limit is not None and page is not None:
+        offset = (page - 1) * limit
+        subdomains = subdomains.skip(offset).limit(limit)
+
+    return subdomains
+
+
+def get_http_services(
+    program=None,
+    scope=None,
+    provider=None,
+    title=None,
+    status=None,
+    fresh=False,
+    latest=False,
+    count=False,
+    limit=None,
+    page=None,
+):
+    filters = {}
+    if program:
+        filters["program_name"] = program
+    if scope:
+        filters["scope"] = scope
+    if fresh:
+        twenty_four_hours_ago = datetime.now() - timedelta(hours=24)
+        filters["created_date__gte"] = twenty_four_hours_ago
+    if provider:
+        subdomains = Subdomains.objects(providers=[provider])
+        sub_urls = [sub.subdomain for sub in subdomains]
+        filters["subdomain__in"] = sub_urls
+    if title:
+        filters["title"] = title
+    if status:
+        filters["status_code"] = status
+    if latest:
+        twelve_hours_ago = datetime.now() - timedelta(hours=12)
+        filters["last_update__gte"] = twelve_hours_ago
+
+    http = Http.objects(**filters)
+    if count:
+        return http.count()
+
+    if limit is not None and page is not None:
+        offset = (page - 1) * limit
+        http = http.skip(offset).limit(limit)
+
+    return http
