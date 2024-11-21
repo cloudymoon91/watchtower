@@ -90,6 +90,7 @@ watch_nuclei_all
 
 7. run with this command:
 ```bash
+tmux attach -t watchtower
 python3 app.py
 ```
 
